@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 import openai
 from langchain.callbacks.base import BaseCallbackHandler
 import os
-os.environ["OPENAI_API_KEY"] = None
+os.environ["OPENAI_API_KEY"] = ""
 openai.api_key = ""
 # Streamlit configurations
 st.markdown("<h1 style='text-align: center;'>Get me a Nobel prize</h1>", unsafe_allow_html=True)
