@@ -48,6 +48,7 @@ SOFTWARE.
 # Get Me A Nobel Prize - powered by LLMs
  A streamlined interface built on Streamlit that interacts with the GPT-4 or GPT-3.5 models (custom models coming soon!) from OpenAI to generate scientific hypotheses. Users can input their scientific problems or the output of their machine learning algorithm of choice to generate potential solutions and visualizations. The visualization is powered by UMAP, and is used to visualize the one-sentence embeddings of the generated hypotheses, where semanticaly similar hypotheses are going to be closer together.
  ![App Screenshot](screenshot.png)
+ 
  The app can be accessed here:
  
  ## 🌟 Features
