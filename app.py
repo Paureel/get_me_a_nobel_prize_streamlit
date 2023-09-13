@@ -16,7 +16,8 @@ from langchain.prompts import PromptTemplate
 from pydantic import BaseModel, Field
 import openai
 from langchain.callbacks.base import BaseCallbackHandler
-
+import os
+os.environ["OPENAI_API_KEY"] = None
 openai.api_key = ""
 # Streamlit configurations
 st.markdown("<h1 style='text-align: center;'>Get me a Nobel prize</h1>", unsafe_allow_html=True)
@@ -70,7 +71,9 @@ if user_api_key:
     try:
         # Set the API key for OpenAI
         openai.api_key = user_api_key
+        os.environ["OPENAI_API_KEY"] = user_api_key
         st.sidebar.success("OpenAI API key has been set successfully!")
+        embeddings_model = OpenAIEmbeddings()
     except Exception as e:
         st.sidebar.error(f"Error setting API Key: {e}")
 else:
@@ -92,7 +95,7 @@ for example in example_texts:
 st.sidebar.title("Generated and stored hypotheses")
 for hypoth in st.session_state['calc_hypotheses']:
     st.sidebar.text(hypoth)
-embeddings_model = OpenAIEmbeddings()
+
 # User input processing
 user_input = st.sidebar.text_area("Input new hypotheses, delimited by '.':")
 if user_input:

@@ -136,7 +136,6 @@ typing_extensions==4.7.1
 tzdata==2023.3
 tzlocal==4.3.1
 umap-learn==0.5.3
-urllib3==2.0.4
 uvicorn==0.23.2
 validators==0.22.0
 virtualenv==20.24.2
