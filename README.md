@@ -44,6 +44,7 @@ SOFTWARE.
   <a href="https://github.com/Paureel/get_me_a_nobel_prize_streamlit">
     <img src="logo.png" alt="Logo" width="80" height="80">
   </a>
+  
 # Get Me A Nobel Prize - powered by LLMs
  A streamlined interface built on Streamlit that interacts with the GPT-4 or GPT-3.5 models (custom models coming soon!) from OpenAI to generate scientific hypotheses. Users can input their scientific problems or the output of their machine learning algorithm of choice to generate potential solutions and visualizations. The visualization is powered by UMAP, and is used to visualize the one-sentence embeddings of the generated hypotheses, where semanticaly similar hypotheses are going to be closer together.
  ![App Screenshot](screenshot.png)
@@ -72,16 +73,15 @@ SOFTWARE.
    ```
 2. **Navigate**:
 	```sh
-		cd get_me_a_nobel_prize_streamlit
+	cd get_me_a_nobel_prize_streamlit
 	```
 3. **Install Dependencies**:
-
 	```sh
-		conda create --name envname --file requirements.txt
+	conda create --name envname --file requirements.txt
 	```
 4. **Run**:
 	```sh
-		streamlit run app.py
+	streamlit run app.py
 	```
 	
 ## Todos
@@ -102,9 +102,9 @@ SOFTWARE.
 
 MIT License. See `LICENSE` for details.
 
-** Support
+## Support
 
 If you liked this project, you can support me by buying me a coffee here :) : buymeacoffee.com/aurelproszw
 
-** Acknowledgements
+## Acknowledgements
 Thank you for Astropomeai for the initial Tree of Thoughts Langchain implementation: https://medium.com/@astropomeai/implementing-the-tree-of-thoughts-in-langchains-chain-f2ebc5864fac
