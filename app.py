@@ -17,8 +17,7 @@ from pydantic import BaseModel, Field
 import openai
 from langchain.callbacks.base import BaseCallbackHandler
 import os
-os.environ["OPENAI_API_KEY"] = ""
-openai.api_key = ""
+
 # Streamlit configurations
 st.markdown("<h1 style='text-align: center;'>Get me a Nobel prize</h1>", unsafe_allow_html=True)
 
@@ -70,8 +69,10 @@ user_api_key = st.sidebar.text_input("Enter your OpenAI API Key:", type="passwor
 if user_api_key:
     try:
         # Set the API key for OpenAI
+      
         openai.api_key = user_api_key
-        #os.environ["OPENAI_API_KEY"] = user_api_key
+        
+       
         st.sidebar.success("OpenAI API key has been set successfully!")
         embeddings_model = OpenAIEmbeddings()
     except Exception as e:
@@ -168,7 +169,10 @@ class NamedLLMChain(LLMChain):
             self.__dict__['name'] = value
         else:
             super(NamedLLMChain, self).__setattr__(key, value)
+
+
 if(user_api_key):
+
     chain1 = NamedLLMChain(
         llm=ChatOpenAI(temperature=0.3, model=model, streaming=True,callbacks=[NewChainHandler()]),
         prompt=prompt,
@@ -193,7 +197,7 @@ if(user_api_key):
     )
 
     chain2 = LLMChain(
-        llm=ChatOpenAI(temperature=0.3, model=model, streaming=True,callbacks=[NewChainHandler()]),
+        llm=ChatOpenAI( temperature=0.3, model=model, streaming=True,callbacks=[NewChainHandler()]),
         prompt=prompt,
         output_key="one_sentence"
     )
