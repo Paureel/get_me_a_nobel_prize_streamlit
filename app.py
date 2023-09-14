@@ -71,7 +71,7 @@ if user_api_key:
     try:
         # Set the API key for OpenAI
         openai.api_key = user_api_key
-        os.environ["OPENAI_API_KEY"] = user_api_key
+        #os.environ["OPENAI_API_KEY"] = user_api_key
         st.sidebar.success("OpenAI API key has been set successfully!")
         embeddings_model = OpenAIEmbeddings()
     except Exception as e:
@@ -168,47 +168,47 @@ class NamedLLMChain(LLMChain):
             self.__dict__['name'] = value
         else:
             super(NamedLLMChain, self).__setattr__(key, value)
-
-chain1 = NamedLLMChain(
-    llm=ChatOpenAI(temperature=0.3, model=model, streaming=True,callbacks=[NewChainHandler()]),
-    prompt=prompt,
-    output_key="solutions",name = "Chain 1"
-)
-
-
-
-
-
-template ="""
-Step 2:
-
-Based on the highest ranked hypothesis, summarize the core of the hypothesis in one long sentence, and the second part of the sentence should describe why the hypothesis is thought to be true related to the measured variables in the model connected to knowledge about the world. It is very important to be only one sentence long and don't say anythin about this is a core hypothesis etc, just give me the core hypothesis
-{solutions}
-
-One sentence summary:"""
-
-prompt = PromptTemplate(
-    input_variables=["solutions"],
-    template = template                      
-)
-
-chain2 = LLMChain(
-    llm=ChatOpenAI(temperature=0.3, model=model, streaming=True,callbacks=[NewChainHandler()]),
-    prompt=prompt,
-    output_key="one_sentence"
-)
+if(user_api_key):
+    chain1 = NamedLLMChain(
+        llm=ChatOpenAI(temperature=0.3, model=model, streaming=True,callbacks=[NewChainHandler()]),
+        prompt=prompt,
+        output_key="solutions",name = "Chain 1"
+    )
 
 
 
 
 
+    template ="""
+    Step 2:
 
-overall_chain = SequentialChain(
-    chains=[chain1, chain2],
-    input_variables=["input", "perfect_factors"],
-    output_variables=["one_sentence"],
-    verbose=True,callbacks=[NewChainHandler()]
-)
+    Based on the highest ranked hypothesis, summarize the core of the hypothesis in one long sentence, and the second part of the sentence should describe why the hypothesis is thought to be true related to the measured variables in the model connected to knowledge about the world. It is very important to be only one sentence long and don't say anythin about this is a core hypothesis etc, just give me the core hypothesis
+    {solutions}
+
+    One sentence summary:"""
+
+    prompt = PromptTemplate(
+        input_variables=["solutions"],
+        template = template                      
+    )
+
+    chain2 = LLMChain(
+        llm=ChatOpenAI(temperature=0.3, model=model, streaming=True,callbacks=[NewChainHandler()]),
+        prompt=prompt,
+        output_key="one_sentence"
+    )
+
+
+
+
+
+
+    overall_chain = SequentialChain(
+        chains=[chain1, chain2],
+        input_variables=["input", "perfect_factors"],
+        output_variables=["one_sentence"],
+        verbose=True,callbacks=[NewChainHandler()]
+    )
 
 
 
