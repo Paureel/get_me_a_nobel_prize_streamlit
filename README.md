@@ -32,7 +32,7 @@ SOFTWARE.
 <br />
 <p align="center">
   <a href="https://github.com/Paureel/get_me_a_nobel_prize_streamlit">
-    <img src="logo.png" alt="Logo" width="80" height="80">
+    <img src="project_logo.png" alt="Logo" width="80" height="80">
   </a>
   
 # Get Me A Nobel Prize - powered by LLMs
