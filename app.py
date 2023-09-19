@@ -18,6 +18,20 @@ import openai
 from langchain.callbacks.base import BaseCallbackHandler
 import os
 
+model_name = "gpt-4"
+
+class NamedLLMChain(LLMChain):
+    def __init__(self, *args, name=None, **kwargs):
+        super(NamedLLMChain, self).__init__(*args, **kwargs)
+        self.__dict__['name'] = name or 'Unnamed Chain'
+    
+    def __setattr__(self, key, value):
+        if key == "name":
+            self.__dict__['name'] = value
+        else:
+            super(NamedLLMChain, self).__setattr__(key, value)
+
+
 # Streamlit configurations
 st.markdown("<h1 style='text-align: center;'>Get me a Nobel prize</h1>", unsafe_allow_html=True)
 
@@ -70,17 +84,69 @@ if user_api_key:
     try:
         # Set the API key for OpenAI
       
-        openai.api_key = user_api_key
+        openai_api_key = user_api_key
         
-       
+        os.environ['OPENAI_API_KEY'] = openai_api_key
+
+        
         st.sidebar.success("OpenAI API key has been set successfully!")
+        model_name = st.sidebar.radio("Choose a model:", ("gpt-4", "gpt-3.5-turbo"))
         embeddings_model = OpenAIEmbeddings()
+        # Prompts and chains are defined here
+        template ="""
+        Step 1 :
+         
+        I have a problem related to {input}. Could you brainstorm three distinct hypotheses? These hypotheses must be completely non-trivial, and something which can be only discovered when combining humanity’s all scientific knowledge with the results from the machine learning method presented above. The more complex the hypotheses are, the better. Give them very detailed, informative hypothesis names. It is very important to be as detailed as possbile, especially with the methods you suggest. Please consider a variety of factors such as {perfect_factors}. At the end rank the three hypotheses by scientific soundness and novelty
+        A:
+        """
+
+        prompt = PromptTemplate(
+            input_variables=["input","perfect_factors"],
+            template = template                      
+        )
+
+
+        chain1 = NamedLLMChain(
+        llm=ChatOpenAI(temperature=0.3, model=model_name, streaming=True,callbacks=[NewChainHandler()]),
+        prompt=prompt,
+        output_key="solutions",name = "Chain 1"
+)
+        template ="""
+        Step 2:
+
+        Based on the highest ranked hypothesis, summarize the core of the hypothesis in one long sentence, and the second part of the sentence should describe why the hypothesis is thought to be true related to the measured variables in the model connected to knowledge about the world. It is very important to be only one sentence long and don't say anythin about this is a core hypothesis etc, just give me the core hypothesis
+        {solutions}
+
+        One sentence summary:"""
+
+        prompt = PromptTemplate(
+            input_variables=["solutions"],
+            template = template                      
+        )
+
+
+
+        chain2 = NamedLLMChain(
+            llm=ChatOpenAI( temperature=0.3, model=model_name, streaming=True,callbacks=[NewChainHandler()]),
+            prompt=prompt,
+            output_key="one_sentence"
+        )
+
+
+
+
+        overall_chain = SequentialChain(
+            chains=[chain1, chain2],
+            input_variables=["input", "perfect_factors"],
+            output_variables=["one_sentence"],
+            verbose=True,callbacks=[NewChainHandler()]
+        )
     except Exception as e:
         st.sidebar.error(f"Error setting API Key: {e}")
 else:
     st.sidebar.warning("Please enter an API key to proceed.")
 st.sidebar.title("Tools and information")
-model_name = st.sidebar.radio("Choose a model:", ("gpt-4", "gpt-3.5-turbo"))
+
 # Number input for total_iterate
 st.session_state['total_iterate'] = st.sidebar.number_input('Set Total Iterations:', min_value=1, value=5, step=1)
 
@@ -114,11 +180,7 @@ if user_input:
         fig = px.scatter(x=reduced_data[0], y=reduced_data[1], hover_name=st.session_state['calc_hypotheses'])
         st.plotly_chart(fig)
 
-# Model selection
-if model_name == "gpt-3.5-turbo":
-    model = "gpt-3.5-turbo"
-else:
-    model = "gpt-4"
+
 
 msgs = StreamlitChatMessageHistory()
 memory = ConversationBufferMemory(memory_key="chat_history", chat_memory=msgs, return_messages=True)
@@ -145,74 +207,15 @@ st.download_button(
 )
 
 
-# Prompts and chains are defined here
-template ="""
-Step 1 :
- 
-I have a problem related to {input}. Could you brainstorm three distinct hypotheses? These hypotheses must be completely non-trivial, and something which can be only discovered when combining humanity’s all scientific knowledge with the results from the machine learning method presented above. The more complex the hypotheses are, the better. Give them very detailed, informative hypothesis names. It is very important to be as detailed as possbile, especially with the methods you suggest. Please consider a variety of factors such as {perfect_factors}. At the end rank the three hypotheses by scientific soundness and novelty
-A:
-"""
-
-prompt = PromptTemplate(
-    input_variables=["input","perfect_factors"],
-    template = template                      
-)
-
-
-class NamedLLMChain(LLMChain):
-    def __init__(self, *args, name=None, **kwargs):
-        super(NamedLLMChain, self).__init__(*args, **kwargs)
-        self.__dict__['name'] = name or 'Unnamed Chain'
-    
-    def __setattr__(self, key, value):
-        if key == "name":
-            self.__dict__['name'] = value
-        else:
-            super(NamedLLMChain, self).__setattr__(key, value)
-
-
-if(user_api_key):
-
-    chain1 = NamedLLMChain(
-        llm=ChatOpenAI(temperature=0.3, model=model, streaming=True,callbacks=[NewChainHandler()]),
-        prompt=prompt,
-        output_key="solutions",name = "Chain 1"
-    )
-
-
-
-
-
-    template ="""
-    Step 2:
-
-    Based on the highest ranked hypothesis, summarize the core of the hypothesis in one long sentence, and the second part of the sentence should describe why the hypothesis is thought to be true related to the measured variables in the model connected to knowledge about the world. It is very important to be only one sentence long and don't say anythin about this is a core hypothesis etc, just give me the core hypothesis
-    {solutions}
-
-    One sentence summary:"""
-
-    prompt = PromptTemplate(
-        input_variables=["solutions"],
-        template = template                      
-    )
-
-    chain2 = LLMChain(
-        llm=ChatOpenAI( temperature=0.3, model=model, streaming=True,callbacks=[NewChainHandler()]),
-        prompt=prompt,
-        output_key="one_sentence"
-    )
 
 
 
 
 
 
-    overall_chain = SequentialChain(
-        chains=[chain1, chain2],
-        input_variables=["input", "perfect_factors"],
-        output_variables=["one_sentence"],
-        verbose=True,callbacks=[NewChainHandler()]
-    )
+
+
+
 
 
 
