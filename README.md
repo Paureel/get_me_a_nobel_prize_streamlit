@@ -52,7 +52,7 @@ SOFTWARE.
 
 - Python (>= 3.7)
 - Streamlit
-- OpenAI Python client
+- OpenAI API key
 - UMAP
 - Plotly
 
